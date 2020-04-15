@@ -1,0 +1,1 @@
+Customized driver, adopted from the original Agilent_34401A_Multimeter under the MIT license
