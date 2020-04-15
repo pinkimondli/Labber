@@ -36,8 +36,8 @@ class Driver(LabberDriver):
 		return the actual value set by the instrument"""
 		self.visa_handle.read_bytes(self.visa_handle.bytes_in_buffer)
 		
-		if quant.name in ['Dac1','Dac2','Dac3','Dac4','Dac5','Dac6','Dac7','Dac8']:
-			dacNr = int(list(quant.name)[-1])
+		if quant.name in ['Dac1','Dac2','Dac3','Dac4','Dac5','Dac6','Dac7','Dac8','Dac9','Dac10','Dac11','Dac12','Dac13','Dac14','Dac15','Dac16']:
+			dacNr = int(quant.name[3:])
 			pol_offset = self._polarity_offset(dacNr)
 						
 			# convert the value to the correct byte value, taking into account the polarity
@@ -72,9 +72,9 @@ class Driver(LabberDriver):
 		
 	def performGetValue(self, quant, options={}):
 		self.visa_handle.read_bytes(self.visa_handle.bytes_in_buffer)
-		if quant.name in ['Dac1','Dac2','Dac3','Dac4','Dac5','Dac6','Dac7','Dac8']:
-			dacNr = int(list(quant.name)[-1])
-			if dacNr <1 or dacNr>8:
+		if quant.name in ['Dac1','Dac2','Dac3','Dac4','Dac5','Dac6','Dac7','Dac8','Dac9','Dac10','Dac11','Dac12','Dac13','Dac14','Dac15','Dac16']:
+			dacNr = int(quant.name[3:])
+			if dacNr <1 or dacNr>16:
 				raise 'Invalid dacNr'
 			pol_offset = self._polarity_offset(dacNr)
 			
@@ -97,7 +97,7 @@ class Driver(LabberDriver):
 					i+=1			
 				if byte_mess[1]:
 					value = byte_mess[1]
-                                        valueisset = False
+					valueisset = False
 				if self.visa_handle.bytes_in_buffer == 0:
 					value = ((byte_mess[2+2*(dacNr-1)]*256 + byte_mess[3+2*(dacNr-1)]) / 65535.0 * 4000 - pol_offset) / 1000
 					valueisset = True
@@ -113,12 +113,16 @@ class Driver(LabberDriver):
 		
 	def _polarity_offset(self,dacNr):
 		# first ask for the polarity
-		if dacNr <1 or dacNr > 8:
-			raise 'dacNr invalid'
+		if dacNr <1 or dacNr > 16:
+			raise 'dacNr invalid' 
 		if dacNr <= 4:
 			polarity = self.readValueFromOther('Polarity 1-4')
 		elif dacNr <= 8:
 			polarity = self.readValueFromOther('Polarity 5-8')
+		elif dacNr <= 12:
+			polarity = self.readValueFromOther('Polarity 9-12')
+		elif dacNr <= 16:
+			polarity = self.readValueFromOther('Polarity 13-16')
 		
 		# set the offset according to the polarity
 		if polarity == 'NEG':
